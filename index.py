@@ -7,6 +7,8 @@ import time
 from fastapi.templating import Jinja2Templates
 from collections import deque
 from datetime import datetime
+from fastapi.staticfiles import StaticFiles
+
 
 
 
@@ -28,6 +30,7 @@ async def lifespan(app: FastAPI):
 # Initiate the App with Lifespan and templates
 app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 

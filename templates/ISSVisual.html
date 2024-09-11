@@ -24,9 +24,19 @@
       fetch('http://127.0.0.1:8000/getISSCoordinates')
         .then(response => response.json())
         .then(data => {
-          if (Array.isArray(data)) { 
+          if (Array.isArray(data)) {
             for (const coord of data) {
-              L.marker([parseFloat(coord.latitude), parseFloat(coord.longitude)]).addTo(map).bindTooltip(coord.timestamp);
+
+              // Creating Custom marker icon
+              const customIcon = L.icon({
+                iconUrl: './static/Gen_Sat.svg',
+                iconSize: [25, 25],
+                iconAnchor: [12, 40],
+                popupAnchor: [1, -20]
+              });
+
+
+              L.marker([parseFloat(coord.latitude), parseFloat(coord.longitude)], {icon: customIcon}).addTo(map).bindTooltip(coord.timestamp);
             }
           } else {
             console.error('Error: Data is not an array');
