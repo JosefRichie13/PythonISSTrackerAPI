@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Live Coordinate Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" crossorigin="" />
+</head>
+
+<body>
+  <div id="map" style="height: 750px;"></div>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    // Define the map element
+    var map = L.map('map').setView([31.705791, 35.200657], 2); // Initial view with example coordinates
+
+    // Add base tiles (e.g., OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Function to fetch data from API and update marker
+    function updateMarker() {
+      fetch('http://127.0.0.1:8000/getISSCoordinates')
+        .then(response => response.json())
+        .then(data => {
+          if (Array.isArray(data)) { // Check if data is an array
+            for (const coord of data) {
+              L.marker([parseFloat(coord.latitude), parseFloat(coord.longitude)]).addTo(map);
+            }
+          } else {
+            console.error('Error: Data is not an array');
+          }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Create a marker (initially empty)
+    var marker;
+
+    // Call updateMarker function initially and set interval for updates
+    updateMarker();
+    setInterval(updateMarker, 30000); // Update every 30 seconds
+  </script>
+</body>
+
+</html>
