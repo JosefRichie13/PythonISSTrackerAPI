@@ -54,12 +54,11 @@ def landingPage():
 
 
 # Function to convert Epoch to redable time
-# Returns 
+# Returns date in DD-MMM-YYYY HH:MM:SS format i.e. 11-Sept-2024 16:07:34 GMT
 def epochToRedableTime(timeToConvert):
     convertedDate = datetime.fromtimestamp(timeToConvert)
     formatted_date = convertedDate.strftime("%d-%b-%Y %H:%M:%S")
     return str(formatted_date) + " GMT"
-
 
 
 
@@ -69,17 +68,33 @@ def getCoordinates():
     # ISS URL which returns the coordinate details
     issUrl = "http://api.open-notify.org/iss-now.json"
 
+    # Another ISS URL
+    issUrlTwo = "https://api.wheretheiss.at/v1/satellites/25544"
+
     # Infinite loop, which requests the data from the URL
-    # Parses and extracts the details (Latitude, Longitude, Timestamp) that are needed and appends to the dequeue
+    # Parses and extracts all the details that are needed and appends to the dequeue
     # Sleeps for 60 seconds and loops again
     index = 0
     while index < 1:
         try:
-            requestData = requests.get(url=issUrl, timeout=50)
+            # Code if we are using the issUrl, this does not have Altitude or Speed data
+            # requestData = requests.get(url=issUrl, timeout=50)
+            # extractedData = requestData.json()
+            # listOfCoordinates.appendleft({"latitude": extractedData["iss_position"]['latitude'], 
+            #                                 "longitude": extractedData["iss_position"]['longitude'], 
+            #                                 "timestamp": epochToRedableTime(extractedData["timestamp"])})
+            
+                        
+            # Code if we are using the issUrlTwo, this has Altitude and Speed data
+            requestData = requests.get(url=issUrlTwo, timeout=50)
             extractedData = requestData.json()
-            listOfCoordinates.appendleft({"latitude": extractedData["iss_position"]['latitude'], 
-                                            "longitude": extractedData["iss_position"]['longitude'], 
-                                            "timestamp": epochToRedableTime(extractedData["timestamp"])})
+            listOfCoordinates.appendleft({"latitude": extractedData['latitude'], 
+                                            "longitude": extractedData['longitude'], 
+                                            "timestamp": epochToRedableTime(extractedData["timestamp"]),
+                                            "altitude": (round(extractedData["altitude"], 2)),
+                                            "velocity": (round(extractedData["velocity"], 2))                                                                                        
+                                            })
+
             print("Got response from API")
         except:
             print("API Failed to respond")

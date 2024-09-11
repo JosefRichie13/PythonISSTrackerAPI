@@ -36,7 +36,9 @@
               });
 
 
-              L.marker([parseFloat(coord.latitude), parseFloat(coord.longitude)], {icon: customIcon}).addTo(map).bindTooltip(coord.timestamp);
+              L.marker([parseFloat(coord.latitude), parseFloat(coord.longitude)], {icon: customIcon})
+                        .addTo(map)
+                        .bindTooltip(`Time: ${coord.timestamp}<br>Altitude: ${coord.altitude} km<br>Speed: ${coord.velocity} km`);
             }
           } else {
             console.error('Error: Data is not an array');
