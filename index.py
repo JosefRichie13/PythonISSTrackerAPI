@@ -6,6 +6,8 @@ import threading
 import time
 from fastapi.templating import Jinja2Templates
 from collections import deque
+from datetime import datetime
+
 
 
 # Create a Deque [0,0,0,0,0,0,0,0,0,0] and length 10 to hold the coordinates.
@@ -48,6 +50,15 @@ def landingPage():
     return {"status": "Hello"}
 
 
+# Function to convert Epoch to redable time
+# Returns 
+def epochToRedableTime(timeToConvert):
+    convertedDate = datetime.fromtimestamp(timeToConvert)
+    formatted_date = convertedDate.strftime("%d-%b-%Y %H:%M:%S")
+    return str(formatted_date) + " GMT"
+
+
+
 
 # Function to generate ISS coordinates
 def getCoordinates():
@@ -62,11 +73,14 @@ def getCoordinates():
     while index < 1:
         try:
             requestData = requests.get(url=issUrl, timeout=50)
+            extractedData = requestData.json()
+            listOfCoordinates.appendleft({"latitude": extractedData["iss_position"]['latitude'], 
+                                            "longitude": extractedData["iss_position"]['longitude'], 
+                                            "timestamp": epochToRedableTime(extractedData["timestamp"])})
             print("Got response from API")
         except:
             print("API Failed to respond")
-        extractedData = requestData.json()
-        listOfCoordinates.appendleft({"latitude": extractedData["iss_position"]['latitude'], "longitude": extractedData["iss_position"]['longitude'], "timestamp": extractedData["timestamp"]})
+
         time.sleep(60)
 
 
