@@ -13,6 +13,7 @@ from collections import deque
 listOfCoordinates = deque([0] * 10, maxlen=10)
 
 
+
 # Create a Lifespan event
 # On the start of the App, a thread is created which calls the function, getCoordinates
 @asynccontextmanager
@@ -21,9 +22,11 @@ async def lifespan(app: FastAPI):
     yield
 
 
+
 # Initiate the App with Lifespan and templates
 app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="templates")
+
 
 
 # Configures CORS settings
@@ -38,14 +41,15 @@ app.add_middleware(
 )
 
 
+
 # Landing Page
 @app.get("/")
 def landingPage():
     return {"status": "Hello"}
 
+
+
 # Function to generate ISS coordinates
-
-
 def getCoordinates():
 
     # ISS URL which returns the coordinate details
@@ -66,10 +70,12 @@ def getCoordinates():
         time.sleep(60)
 
 
+
 # Returns the coordinates as a list
 @app.get("/getISSCoordinates")
 def getISSCoordinates():
     return list(listOfCoordinates)
+
 
 
 # Displays the map
