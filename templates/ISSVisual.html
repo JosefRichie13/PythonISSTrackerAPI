@@ -20,7 +20,8 @@
     var map = L.map('map', mapOptions);
 
     // Add base tiles and add it to the map
-    var layer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { noWrap: true });
+    // var layer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { noWrap: true }); // Will wrap the map, displaying only 1 map
+    var layer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
     map.addLayer(layer)
 
 
