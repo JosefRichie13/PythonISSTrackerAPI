@@ -20,7 +20,7 @@
     var map = L.map('map', mapOptions);
 
     // Add base tiles and add it to the map
-    var layer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {noWrap: true});
+    var layer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { noWrap: true });
     map.addLayer(layer)
 
 
@@ -33,32 +33,39 @@
 
       // Custom Icons for ISS and Sun for display
       const customISSIcon = L.icon({
-          iconUrl: './static/Gen_Sat.svg',
-          iconSize: [25, 25],
-          iconAnchor: [12, 40],
-          popupAnchor: [1, -20]
-        });
+        iconUrl: './static/Gen_Sat.svg',
+        iconSize: [25, 25],
+        iconAnchor: [12, 40],
+        popupAnchor: [1, -20]
+      });
 
       const customSunIcon = L.icon({
-          iconUrl: './static/Sun.svg',
-          iconSize: [25, 25],
-          iconAnchor: [12, 40],
-          popupAnchor: [1, -20]
-        });
+        iconUrl: './static/Sun.svg',
+        iconSize: [25, 25],
+        iconAnchor: [12, 40],
+        popupAnchor: [1, -20]
+      });
 
 
       // Loop for ISS display
       // Loops through the length of the JSON data and creates the marker(issMarker), tooltip, add the marker to the layer(issLayerGroup) and add to the map
-      for (index = 0; index < data.length; index++) {
-        var issMarker = new L.Marker([parseFloat(data[index].latitude), parseFloat(data[index].longitude)], {icon: customISSIcon})
-        issMarker.bindTooltip(`Time: ${data[index].timestamp}<br>Altitude: ${data[index].altitude} km<br>Speed: ${data[index].velocity} km`);
-        var issLayerGroup = L.layerGroup([issMarker])
-        issLayerGroup.addTo(map)
+      // The try/catch handles the error when data is incomplete, during the start of the app, when not all 10 coordinates are returned by the API
+      try {
+        for (index = 0; index < data.length; index++) {
+          var issMarker = new L.Marker([parseFloat(data[index].latitude), parseFloat(data[index].longitude)], { icon: customISSIcon })
+          issMarker.bindTooltip(`Time: ${data[index].timestamp}<br>Altitude: ${data[index].altitude} km<br>Speed: ${data[index].velocity} km`);
+          var issLayerGroup = L.layerGroup([issMarker])
+          issLayerGroup.addTo(map)
+        }
       }
+      catch (err) {
+        // Ignore error
+      }
+
 
       // Marker for the Sun display
       // Creates the marker(sunMarker), tooltip, add the marker to the layer(sunLayerGroup) and add to the map
-      var sunMarker = new L.Marker([parseFloat(data[0].sunLatitude), parseFloat(data[0].sunLongitude)], {icon: customSunIcon})
+      var sunMarker = new L.Marker([parseFloat(data[0].sunLatitude), parseFloat(data[0].sunLongitude)], { icon: customSunIcon })
       sunMarker.bindTooltip(`Sun at ${data[0].timestamp}`);
       var sunLayerGroup = L.layerGroup([sunMarker])
       sunLayerGroup.addTo(map)
