@@ -1,6 +1,6 @@
 # ISS Tracking App using FastAPI, Leaflet and Python
 
-This repo has the code for a ISS Tracking App.
+This repo has the code for a ISS Tracking App. The ISS data is polled from https://wheretheiss.at/w/developer
 
 The below REST API endpoints are exposed
 
