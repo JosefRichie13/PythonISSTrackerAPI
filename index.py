@@ -58,17 +58,17 @@ def landingPage():
 def epochToRedableTime(timeToConvert):
     convertedDate = datetime.fromtimestamp(timeToConvert)
     formatted_date = convertedDate.strftime("%d-%b-%Y %H:%M:%S")
-    return str(formatted_date) + " GMT"
+    return str(formatted_date) + " IST"
 
 
 
 # Function to generate ISS coordinates
 def getCoordinates():
 
-    # ISS URL which returns the coordinate details
+    # ISS URL which returns the coordinate details, this returns time in GMT
     issUrl = "http://api.open-notify.org/iss-now.json"
 
-    # Another ISS URL
+    # Another ISS URL, this returns time in browser time
     issUrlTwo = "https://api.wheretheiss.at/v1/satellites/25544"
 
     # Infinite loop, which requests the data from the URL
@@ -92,7 +92,9 @@ def getCoordinates():
                                             "longitude": extractedData['longitude'], 
                                             "timestamp": epochToRedableTime(extractedData["timestamp"]),
                                             "altitude": (round(extractedData["altitude"], 2)),
-                                            "velocity": (round(extractedData["velocity"], 2))                                                                                        
+                                            "velocity": (round(extractedData["velocity"], 2)),
+                                            "sunLatitude": extractedData["solar_lat"],
+                                            "sunLongitude": extractedData["solar_lon"]                                                                                     
                                             })
 
             print("Got response from API")

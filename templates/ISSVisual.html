@@ -1,54 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Live Coordinate Map</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" crossorigin="" />
+  <title>Live ISS and Sun tracker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 </head>
 
 <body>
   <div id="map" style="height: 750px;"></div>
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" crossorigin=""></script>
-  <script>
-    // Define the map element
-    var map = L.map('map').setView([31.705791, 35.200657], 2); // Initial view with coordinates of Bethlehem, its kind of in the center of a flat map
 
-    // Add base tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+  <script>
+
+    // Add map options, centering around Bethlehem as its in the center of a map
+    var mapOptions = {
+      center: [31.705791, 35.200657],
+      zoom: 2
+    }
+    // Create a map with the options
+    var map = L.map('map', mapOptions);
+
+    // Add base tiles and add it to the map
+    var layer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {noWrap: true});
+    map.addLayer(layer)
+
 
     // Function to fetch data from API and loop through the response to add map markers
-    function updateMarker() {
-      fetch('http://127.0.0.1:8000/getISSCoordinates')
-        .then(response => response.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            for (const coord of data) {
+    async function updateMarker() {
 
-              // Creating Custom marker icon
-              const customIcon = L.icon({
-                iconUrl: './static/Gen_Sat.svg',
-                iconSize: [25, 25],
-                iconAnchor: [12, 40],
-                popupAnchor: [1, -20]
-              });
+      // Hit the API and get the data as a JSON
+      const response = await fetch('http://127.0.0.1:8000/getISSCoordinates')
+      const data = await response.json()
+
+      // Custom Icons for ISS and Sun for display
+      const customISSIcon = L.icon({
+          iconUrl: './static/Gen_Sat.svg',
+          iconSize: [25, 25],
+          iconAnchor: [12, 40],
+          popupAnchor: [1, -20]
+        });
+
+      const customSunIcon = L.icon({
+          iconUrl: './static/Sun.svg',
+          iconSize: [25, 25],
+          iconAnchor: [12, 40],
+          popupAnchor: [1, -20]
+        });
 
 
-              L.marker([parseFloat(coord.latitude), parseFloat(coord.longitude)], {icon: customIcon})
-                        .addTo(map)
-                        .bindTooltip(`Time: ${coord.timestamp}<br>Altitude: ${coord.altitude} km<br>Speed: ${coord.velocity} km`);
-            }
-          } else {
-            console.error('Error: Data is not an array');
-          }
-        })
-        .catch(error => console.error('Error fetching data:', error));
+      // Loop for ISS display
+      // Loops through the length of the JSON data and creates the marker(issMarker), tooltip, add the marker to the layer(issLayerGroup) and add to the map
+      for (index = 0; index < data.length; index++) {
+        var issMarker = new L.Marker([parseFloat(data[index].latitude), parseFloat(data[index].longitude)], {icon: customISSIcon})
+        issMarker.bindTooltip(`Time: ${data[index].timestamp}<br>Altitude: ${data[index].altitude} km<br>Speed: ${data[index].velocity} km`);
+        var issLayerGroup = L.layerGroup([issMarker])
+        issLayerGroup.addTo(map)
+      }
+
+      // Marker for the Sun display
+      // Creates the marker(sunMarker), tooltip, add the marker to the layer(sunLayerGroup) and add to the map
+      var sunMarker = new L.Marker([parseFloat(data[0].sunLatitude), parseFloat(data[0].sunLongitude)], {icon: customSunIcon})
+      sunMarker.bindTooltip(`Sun at ${data[0].timestamp}`);
+      var sunLayerGroup = L.layerGroup([sunMarker])
+      sunLayerGroup.addTo(map)
+
     }
-
-    // Create a marker
-    var marker;
 
     // Call updateMarker function and update every 30 seconds
     updateMarker();
