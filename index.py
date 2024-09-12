@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Response, status, Request
+from fastapi import FastAPI, Request
 import requests
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import threading
 import time
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import FileResponse
 from collections import deque
 from datetime import datetime
 from fastapi.staticfiles import StaticFiles
@@ -50,7 +51,7 @@ app.add_middleware(
 # Landing Page
 @app.get("/")
 def landingPage():
-    return {"status": "Hello"}
+    return FileResponse("ISSTracker.html")
 
 
 # Function to convert Epoch to redable time
